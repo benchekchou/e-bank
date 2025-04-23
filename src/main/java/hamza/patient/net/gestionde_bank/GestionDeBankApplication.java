@@ -1,0 +1,70 @@
+package hamza.patient.net.gestionde_bank;
+
+import hamza.patient.net.gestionde_bank.entities.BankAccount;
+import hamza.patient.net.gestionde_bank.entities.Customer;
+import hamza.patient.net.gestionde_bank.exceptions.BankAccountNotFoundException;
+import hamza.patient.net.gestionde_bank.exceptions.BanlanceNotSufficientException;
+import hamza.patient.net.gestionde_bank.exceptions.CustomerNotFoundException;
+import hamza.patient.net.gestionde_bank.services.BankAccountService;
+import hamza.patient.net.gestionde_bank.services.BankService;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+@SpringBootApplication
+public class GestionDeBankApplication {
+
+    private final BankAccountService bankAccountService;
+
+    public GestionDeBankApplication(BankAccountService bankAccountService) {
+        this.bankAccountService = bankAccountService;
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(GestionDeBankApplication.class, args);
+    }
+    @Bean
+    CommandLineRunner commandLineRunner(BankAccountService bankService){
+        return args -> {
+            Stream.of("Hassan","Imane","Mohammed").forEach(name->{
+                Customer customer= new Customer();
+                customer.setName(name);
+                customer.setEmail(name+"@gmail.com");
+                bankService.saveCustomer(customer);
+            });
+            bankService.listCustomers().forEach(customer->{
+                try {
+                    bankAccountService.saveCurrentBankAccount(Math.random()*910000,  9000,customer.getId());
+                    bankAccountService.saveSavingBankAccount(Math.random()*10000, 5.5,customer.getId());
+
+                } catch (CustomerNotFoundException e) {
+                    e.printStackTrace();
+                }
+                List<BankAccount> bankAccounts = bankAccountService.listBankAccounts();
+                for(BankAccount bankAccount:bankAccounts) {
+                    for (int i = 0; i < 10; i++) {
+                        try {
+                            // Credit operation doesn't throw BanlanceNotSufficientException
+                            bankAccountService.credit(bankAccount.getId(), 1000 + Math.random() * 120, "Credit");
+
+                            try {
+                                // Debit operation can throw BanlanceNotSufficientException
+                                bankAccountService.debit(bankAccount.getId(), 1000 + Math.random() * 120, "Debit");
+                            } catch (BanlanceNotSufficientException e) {
+                                System.out.println("Insufficient balance for debit operation: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+        };
+    }
+
+}
