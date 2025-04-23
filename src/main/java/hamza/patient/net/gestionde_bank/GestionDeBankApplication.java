@@ -1,10 +1,12 @@
 package hamza.patient.net.gestionde_bank;
 
+import hamza.patient.net.gestionde_bank.dtos.CustomerDTO;
 import hamza.patient.net.gestionde_bank.entities.BankAccount;
 import hamza.patient.net.gestionde_bank.entities.Customer;
 import hamza.patient.net.gestionde_bank.exceptions.BankAccountNotFoundException;
 import hamza.patient.net.gestionde_bank.exceptions.BanlanceNotSufficientException;
 import hamza.patient.net.gestionde_bank.exceptions.CustomerNotFoundException;
+import hamza.patient.net.gestionde_bank.mappers.BankAccountMapperImpl;
 import hamza.patient.net.gestionde_bank.services.BankAccountService;
 import hamza.patient.net.gestionde_bank.services.BankService;
 import org.springframework.boot.CommandLineRunner;
@@ -20,7 +22,7 @@ public class GestionDeBankApplication {
 
     private final BankAccountService bankAccountService;
 
-    public GestionDeBankApplication(BankAccountService bankAccountService) {
+    public GestionDeBankApplication(BankAccountService bankAccountService, BankAccountMapperImpl bankAccountMapperImpl) {
         this.bankAccountService = bankAccountService;
     }
 
@@ -28,12 +30,14 @@ public class GestionDeBankApplication {
         SpringApplication.run(GestionDeBankApplication.class, args);
     }
     @Bean
-    CommandLineRunner commandLineRunner(BankAccountService bankService){
+    CommandLineRunner commandLineRunner(BankAccountService bankService, BankAccountMapperImpl bankAccountMapperImpl){
         return args -> {
             Stream.of("Hassan","Imane","Mohammed").forEach(name->{
-                Customer customer= new Customer();
+                CustomerDTO customer= new CustomerDTO();
                 customer.setName(name);
                 customer.setEmail(name+"@gmail.com");
+
+
                 bankService.saveCustomer(customer);
             });
             bankService.listCustomers().forEach(customer->{
