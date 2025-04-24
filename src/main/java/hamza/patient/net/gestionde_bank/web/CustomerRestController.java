@@ -1,8 +1,11 @@
 package hamza.patient.net.gestionde_bank.web;
 
 import hamza.patient.net.gestionde_bank.dtos.CustomerDTO;
+import hamza.patient.net.gestionde_bank.dtos.OperationDTO;
 import hamza.patient.net.gestionde_bank.entities.Customer;
+import hamza.patient.net.gestionde_bank.entities.Operation;
 import hamza.patient.net.gestionde_bank.exceptions.CustomerNotFoundException;
+import hamza.patient.net.gestionde_bank.repositories.AccountOperationRepository;
 import hamza.patient.net.gestionde_bank.services.BankAccountService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,17 @@ public class CustomerRestController {
     public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
         return bankAccountService.saveCustomer(customerDTO);
    }
+   @PutMapping("/customers/{customerId}")
+    public CustomerDTO updateCustomer(@PathVariable Long customerId, @RequestBody CustomerDTO customerDTO){
+        customerDTO.setId(customerId);
+        return bankAccountService.updateCustomer(customerDTO);
+
+   }
+   @DeleteMapping("/customers/{customerId}")
+   public void deleteCustomer(@PathVariable Long customerId){
+            bankAccountService.deleteCustomer(customerId);
+   }
+
 
 
 }

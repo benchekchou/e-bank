@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class AccountOperationDTO {
+public class OperationDTO {
     private Long id;
     private Date operationDate;
     private double amount;

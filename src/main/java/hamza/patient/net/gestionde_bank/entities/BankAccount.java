@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Entity @Data
 @NoArgsConstructor @AllArgsConstructor
@@ -20,4 +21,6 @@ public abstract class BankAccount {
     private String currency;
     @ManyToOne
     private Customer customer;
+    @OneToMany(mappedBy = "bankAccount",fetch = FetchType.LAZY)
+    private List<Operation> operations;
 }

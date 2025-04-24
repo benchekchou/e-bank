@@ -1,10 +1,6 @@
 package hamza.patient.net.gestionde_bank.services;
 
-import hamza.patient.net.gestionde_bank.dtos.CustomerDTO;
-import hamza.patient.net.gestionde_bank.entities.BankAccount;
-import hamza.patient.net.gestionde_bank.entities.CurrentAccount;
-import hamza.patient.net.gestionde_bank.entities.Customer;
-import hamza.patient.net.gestionde_bank.entities.SavingAccount;
+import hamza.patient.net.gestionde_bank.dtos.*;
 import hamza.patient.net.gestionde_bank.exceptions.BankAccountNotFoundException;
 import hamza.patient.net.gestionde_bank.exceptions.BanlanceNotSufficientException;
 import hamza.patient.net.gestionde_bank.exceptions.CustomerNotFoundException;
@@ -13,16 +9,24 @@ import java.util.List;
 
 public interface BankAccountService {
     CustomerDTO saveCustomer(CustomerDTO customerDTO);
-    CurrentAccount saveCurrentBankAccount(double initialBalance,  double overDraft, Long customerId) throws CustomerNotFoundException;
-    SavingAccount saveSavingBankAccount(double initialBalance, double interestRate, Long customerId) throws CustomerNotFoundException;
+    CurrentAccountDTO saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId) throws CustomerNotFoundException;
+    SavingAccountDTO saveSavingBankAccount(double initialBalance, double interestRate, Long customerId) throws CustomerNotFoundException;
 
     List<CustomerDTO> listCustomers();
-    BankAccount getBankAccountById(String id) throws BankAccountNotFoundException;
+    BankAccountDTO getBankAccountById(String id) throws BankAccountNotFoundException;
     void debit(String id,double amount,String description) throws BankAccountNotFoundException, BanlanceNotSufficientException;
     void credit(String id,double amount,String description) throws BankAccountNotFoundException;
     void transfer(String accountIdSource,String accountIdDestination,double amount) throws BankAccountNotFoundException, BanlanceNotSufficientException;
 
-    List<BankAccount> listBankAccounts();
+    List<BankAccountDTO> listBankAccounts();
 
     CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException;
+
+    CustomerDTO updateCustomer(CustomerDTO customerDTO);
+
+    void deleteCustomer(Long customerId);
+
+    List<OperationDTO> accountHistory(String accountId);
+
+    AccountHistoryDTO getAccountHistory(String accountId, int page, int size) throws BankAccountNotFoundException;
 }

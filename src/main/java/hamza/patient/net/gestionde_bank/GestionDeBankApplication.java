@@ -1,8 +1,12 @@
 package hamza.patient.net.gestionde_bank;
 
+import hamza.patient.net.gestionde_bank.dtos.BankAccountDTO;
+import hamza.patient.net.gestionde_bank.dtos.CurrentAccountDTO;
 import hamza.patient.net.gestionde_bank.dtos.CustomerDTO;
+import hamza.patient.net.gestionde_bank.dtos.SavingAccountDTO;
 import hamza.patient.net.gestionde_bank.entities.BankAccount;
 import hamza.patient.net.gestionde_bank.entities.Customer;
+import hamza.patient.net.gestionde_bank.entities.SavingAccount;
 import hamza.patient.net.gestionde_bank.exceptions.BankAccountNotFoundException;
 import hamza.patient.net.gestionde_bank.exceptions.BanlanceNotSufficientException;
 import hamza.patient.net.gestionde_bank.exceptions.CustomerNotFoundException;
@@ -48,20 +52,23 @@ public class GestionDeBankApplication {
                 } catch (CustomerNotFoundException e) {
                     e.printStackTrace();
                 }
-                List<BankAccount> bankAccounts = bankAccountService.listBankAccounts();
-                for(BankAccount bankAccount:bankAccounts) {
+                List<BankAccountDTO> bankAccounts = bankAccountService.listBankAccounts();
+                for(BankAccountDTO bankAccount:bankAccounts) {
                     for (int i = 0; i < 10; i++) {
+                            String accountId;
                         try {
-                            // Credit operation doesn't throw BanlanceNotSufficientException
-                            bankAccountService.credit(bankAccount.getId(), 1000 + Math.random() * 120, "Credit");
-
-                            try {
-                                // Debit operation can throw BanlanceNotSufficientException
-                                bankAccountService.debit(bankAccount.getId(), 1000 + Math.random() * 120, "Debit");
-                            } catch (BanlanceNotSufficientException e) {
-                                System.out.println("Insufficient balance for debit operation: " + e.getMessage());
-                                e.printStackTrace();
+                            if(bankAccount instanceof SavingAccountDTO){
+                                accountId=((SavingAccountDTO) bankAccount ).getId();
+                            }else {
+                                accountId=((CurrentAccountDTO) bankAccount ).getId();
                             }
+                            bankAccountService.credit(accountId, 1000 + Math.random() * 120, "Credit");
+
+
+                                bankAccountService.debit(accountId, 1000 + Math.random() * 120, "Debit");
+
+                        } catch (BanlanceNotSufficientException e) {
+                            e.printStackTrace();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
