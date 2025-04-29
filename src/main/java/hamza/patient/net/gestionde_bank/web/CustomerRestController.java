@@ -24,6 +24,11 @@ public class CustomerRestController {
     public List<CustomerDTO> listCustomers(){
         return bankAccountService.listCustomers();
     }
+    @GetMapping("/customers/search{kw}")
+    public List<CustomerDTO> listCustomers(@RequestParam(name="kw" ,defaultValue = "") String kw){
+        return bankAccountService.searchCustomers("%"+kw+"%");
+    }
+
     @GetMapping("/customers/{id}")
     public CustomerDTO getCustomer(@PathVariable(name="id") Long customerId) throws CustomerNotFoundException {
         return bankAccountService.getCustomer(customerId);

@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BankAccountServiceImpl implements BankAccountService {
 
+
+
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
@@ -217,6 +219,13 @@ public class BankAccountServiceImpl implements BankAccountService {
 
 
         return accountHistoryDTO ;
+    }
+
+    @Override
+    public List<CustomerDTO> searchCustomers(String kw) {
+        List<Customer> customers = customerRepository.sreachCustomer(kw);
+        List<CustomerDTO> customerDTOS = customers.stream().map(customer -> dtoMapperImpl.fromCustomer(customer)).toList();
+        return customerDTOS ;
     }
 
 
