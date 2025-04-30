@@ -38,4 +38,4 @@ Clone both the back-end and front-end repositories:
 
 ```bash
 git clone https://github.com/benchekchou/e-bank.git
-cd gestion-de-bank
+cd e-bank
