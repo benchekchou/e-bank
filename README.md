@@ -37,5 +37,5 @@ Before you start, ensure you have the following installed on your machine:
 Clone both the back-end and front-end repositories:
 
 ```bash
-git clone <REPOSITORY_URL>
+git clone https://github.com/benchekchou/e-bank.git
 cd gestion-de-bank
