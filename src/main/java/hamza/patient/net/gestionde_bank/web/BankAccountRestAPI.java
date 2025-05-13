@@ -1,9 +1,8 @@
 package hamza.patient.net.gestionde_bank.web;
 
-import hamza.patient.net.gestionde_bank.dtos.AccountHistoryDTO;
-import hamza.patient.net.gestionde_bank.dtos.BankAccountDTO;
-import hamza.patient.net.gestionde_bank.dtos.OperationDTO;
+import hamza.patient.net.gestionde_bank.dtos.*;
 import hamza.patient.net.gestionde_bank.exceptions.BankAccountNotFoundException;
+import hamza.patient.net.gestionde_bank.exceptions.BanlanceNotSufficientException;
 import hamza.patient.net.gestionde_bank.services.BankAccountService;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +36,24 @@ public class BankAccountRestAPI {
                                                @RequestParam(name = "size",defaultValue = "5")int size) throws BankAccountNotFoundException {
         return bankAccountService.getAccountHistory(accountId,page,size);
     }
+    @PostMapping("/accounts/debit")
+    public DebitDTO debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BanlanceNotSufficientException {
+        this.bankAccountService.debit(debitDTO.getAccountId(),debitDTO.getAmount(),debitDTO.getDescription());
+        return debitDTO;
+    }
+    @PostMapping("/accounts/credit")
+    public CreditDTO credit(@RequestBody CreditDTO creditDTO) throws BankAccountNotFoundException {
+        this.bankAccountService.credit(creditDTO.getAccountId(),creditDTO.getAmount(),creditDTO.getDescription());
+        return creditDTO;
+    }
+    @PostMapping("/accounts/transfer")
+    public void transfer(@RequestBody TransferRequestDTO transferRequestDTO) throws BankAccountNotFoundException, BanlanceNotSufficientException {
+        this.bankAccountService.transfer(transferRequestDTO.getAccountSource(),
+                transferRequestDTO.getAccountDestination(),
+                transferRequestDTO.getAmount());
+
+    }
+
 
 
 

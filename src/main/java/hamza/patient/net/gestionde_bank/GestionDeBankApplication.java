@@ -33,6 +33,7 @@ public class GestionDeBankApplication {
     public static void main(String[] args) {
 
         SpringApplication.run(GestionDeBankApplication.class, args);
+        
 
     }
     @Bean

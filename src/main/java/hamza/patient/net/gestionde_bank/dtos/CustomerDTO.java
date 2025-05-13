@@ -1,5 +1,6 @@
 package hamza.patient.net.gestionde_bank.dtos;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
