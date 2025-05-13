@@ -1,21 +1,35 @@
 package hamza.patient.net.gestionde_bank.Security;
 
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.server.SecurityWebFilterChain;
+
+import javax.crypto.spec.SecretKeySpec;
+
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Value("${jwt.secret}")
+    private String secretkey;
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
         PasswordEncoder passwordEncoder = passwordEncoder();
@@ -30,10 +44,32 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
     @Bean
-    public SecurityFilterChain springSecurityFilterChain(HttpSecurity httpSecurity)throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception{
         return httpSecurity
                 .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf()
+                .csrf(csrf->csrf.disable())
+                .authorizeHttpRequests(ar->ar.anyRequest().authenticated())
+                .oauth2ResourceServer(oa->oa.jwt(Customizer.withDefaults()))
+                .build();
 
+
+    }
+    @Bean
+    JwtEncoder jwtEncoder(){
+        //String se="nG7x5A9pVqLz1dR4Wb0CfY8TkMjUe2HsQoXENBvSiZt6rLaJmPDKghu3cFwOyMTbl";
+        return new NimbusJwtEncoder(new ImmutableSecret<>(secretkey.getBytes()));
+    }
+    @Bean
+    JwtDecoder jwtDecoder(){
+        //String se="nG7x5A9pVqLz1dR4Wb0CfY8TkMjUe2HsQoXENBvSiZt6rLaJmPDKghu3cFwOyMTbl";
+        SecretKeySpec secretKey = new SecretKeySpec(secretkey.getBytes(), "RSA");
+        return NimbusJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS512).build();
+    }
+    @Bean
+    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService){
+        DaoAuthenticationProvider daoAuthenticationProvider= new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        return new ProviderManager(daoAuthenticationProvider);
     }
 }
